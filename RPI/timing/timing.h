@@ -1,5 +1,5 @@
 #ifndef TIMING
-
+#define TIMING
 #include "../ethernet/socket.h"
 #include <time.h>
 #include <errno.h>
