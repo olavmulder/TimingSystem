@@ -1,6 +1,9 @@
 #folder
-src/obj/
+RPI/obj
+RPI/bin
 
+#data files
+.txt
 #typical files
 src/inkedlist/main.c
 
