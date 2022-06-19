@@ -1,0 +1,20 @@
+#TODO
+Ardunio:
+    ethernet connection with RPI
+    ir sensor, send data if 
+RPI:
+    poll/interrupt -> ethernet connection with Ardunio
+    ir sensor on gpio
+    code timing
+    server:
+        website:
+            homepage:
+                select current name & distance from db
+                show; last time, best time, all times?
+                subpage:
+                    Add names in db?
+                    Add distances"
+
+
+
+        JSON:
