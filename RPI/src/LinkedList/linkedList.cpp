@@ -81,7 +81,7 @@ void LinkedList::SaveLinkedList(List l){
     }else{
         while(p != NULL){
 
-            fprintf(fptr, "%d,\n%s,\n%d,\n%x,\n%.2f\n\n", \
+            fprintf(fptr, "%d\n%s\n%d\n%x\n%.2f\n\n", \
                 p->id, p->name, p->distance, p->estafette, p->time);
             p = p->next;
         }

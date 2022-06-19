@@ -32,7 +32,9 @@ nav ul {
     list-style-type: none;
     padding: 0;
   }
-  
+  table, th, td {
+    border: 1px solid black;
+  }
   /* Style the content */
   article {
     -webkit-flex: 3;

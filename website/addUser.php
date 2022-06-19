@@ -10,9 +10,7 @@
     <section>
         <nav>
             <ul>
-                <li><a href="#">Overview</a></li>
-                <li><a href="#">Database</a></li>
-                <li><a href="addUser.php">Add Users</a></li>
+                <li><a href="database.php">Database</a></li>
                 <li><a href="index.php">Home</a></li>
             </ul>
         </nav>
