@@ -1,32 +1,37 @@
 #ifndef SOCKET
 #define SOCKET
+
 #include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
-#include <unistd.h>
 #include <stdbool.h>
+#include <cstdlib>
+#include "timing.h"
+#define BUFFER_SIZE 15
 
-#define BUFFER_SIZE 1
-
-#define START_CODE 1
 class Socket{
     private:
-        uint16_t port;
-        int server_fd, new_socket;
+        
         ssize_t valread;
+        int server_fd, new_socket;
         char buffer[BUFFER_SIZE];
-        struct sockaddr_in address;
-        int opt;
-        int addrlen = sizeof(address);
-
+       
+       
+        Timing *t;
     public:
-        Socket(){
-            opt = 1;
+        Socket(Timing *time){
+            t = time;
+        }
+        ~Socket(){
+            close(new_socket);
+            printf("closed socket");
+            shutdown(server_fd, SHUT_RDWR);
         }
         bool CreateSocket(uint16_t port);
-        bool ReadEthernet();
+        void ReadEthernet();
+        void SendEthernet(unsigned char data);
+
+        //void DummyBuffer();
 
 };
     

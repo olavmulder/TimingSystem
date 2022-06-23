@@ -1,18 +1,7 @@
 #include "timing.h"
 
-void Timing::StartTiming(){
-    while(!s->ReadEthernet())printf(".");
-    printf("\nstart timing");
-    start = clock();
-}
 
-long int Timing::StopTiming(){
-    diff = clock() - start;
-    return(diff * 1000 / CLOCKS_PER_SEC);
-}
 void Timing::SetupGPIO(){
-   
-
     fd = open("/sys/class/gpio/export", O_WRONLY);
     if (fd == -1) {
         perror("Unable to open /sys/class/gpio/export");
@@ -44,15 +33,19 @@ void Timing::SetupGPIO(){
         exit(1);
     }
 }
-long int Timing::TimingMain(){
-    char* buf = NULL;
-
-    SetupGPIO();
-    printf("setup gpio done");
-    StartTiming();
-    while(strcmp(buf,"1") != 0 ){
-        read(fd, buf, 1);
-    }
-
-    return(StopTiming());
+void Timing::WriteTimeToFile(){
+    std::ofstream file;
+    file.open( "/home/timing/RPI/bin/curTime.txt", std::ios::trunc);
+    char buf[6];
+    sprintf(buf, "%.2f", time);
+    file << buf;
+    printf("writed\n");
+}
+void Timing::SetTime(long int t){
+    time = 0;
+    double seconds = t/1000;
+    double mil = t%1000;
+    time = seconds+(mil/1000);
+    printf("time: %.2f", time);
+    WriteTimeToFile();
 }

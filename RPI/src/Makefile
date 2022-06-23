@@ -3,7 +3,7 @@ CC = g++
 LINKERFLAG = -lm
 EXECUTABLE = mainTimingSystem
 LIB_PATH := ../obj/
-CFLAGS   := -std=c++17 -fPIC -g -pedantic -Wall -Wextra -ggdb3 -Wall -Wconversion -ansi
+CFLAGS   := -std=c++11 -pedantic -Wall -Wextra -Wall -Wconversion -ansi
 
 SOURCES := timing.cpp socket.cpp mainProgram.cpp
 OBJECTS =$(patsubst %.cpp, %.o, $(SOURCES))

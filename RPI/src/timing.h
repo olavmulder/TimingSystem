@@ -1,27 +1,27 @@
 #ifndef TIMING
 #define TIMING
-#include "socket.h"
-#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <errno.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <unistd.h>
 
 class Timing{
     private:
-        clock_t start,diff;
+        double time;
         int fd;
-        Socket *s;
-
     public:
-        Timing(Socket *socket){
-            s = socket;
-        }
-        void StartTiming();
-        long int StopTiming();
+        Timing(){};
+        ~Timing(){};
         void SetupGPIO();
-        long int TimingMain();
-
+        void SetTime(long int t);
+        void WriteTimeToFile();
 };
 
 
