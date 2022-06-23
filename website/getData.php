@@ -51,7 +51,7 @@ function GetBestTime($data, $distance){
     }
 }
 function GetCurrentTime(){
-    $res = exec("sudo /bin/bash /home/timing/website/addUser.sh {$name}");
+    return exec("cat /home/timing/RPI/bin/curTime.txt");
 }
 
 ?>

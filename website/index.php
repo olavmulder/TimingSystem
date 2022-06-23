@@ -53,8 +53,8 @@
                 $bestTime = GetBestTime($data, $distance);
                 echo "best time on ".$distance. "m is ".$bestTime. " <br>"; 
                 $currTime = GetCurrentTime();
-                echo "<br>Current time:<br>";
-                $currTime = number_format($currTime,2);
+                echo "<br>Current time: ";
+                
                 echo $currTime;
                 
             }

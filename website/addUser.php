@@ -27,7 +27,7 @@
             <?php
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $name = $_POST["name"];
-                    $res = exec("sudo /bin/bash /home/timing/website/addUser.sh {$name}");
+                    $res = exec("sudo /bin/bash /home/timing/website/shellScripts/addUser.sh {$name}");
                     if($res == 1){
                         echo "name already exists, try another name!";
                     }else if($res == 2){
