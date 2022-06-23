@@ -1,2 +1,20 @@
+mkdir -p RPI/obj RPI/bin
+touch RPI/bin/curTime.txt RPI/bin/data.txt RPI/bin/users.txt
+cd RPI/src 
+make
+./RPI/bin/mainTimingSystem
+
+
 Timing system, can measure time with socket connection between RPI & arduino
 webinterface does show after refreshing current time aka last measured time
+
+Start is implemeted with commandline input from the RPI.
+Finish is implemeted with no input from lazer
+
+#TODO next version(s)
+1. add code in rpi to get input from gpio
+1a. make start also automatic 
+
+2. math user to current time & put in database
+
+3. add screen to RPI, to see time without webinterface
