@@ -46,12 +46,16 @@
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $name = $_POST["name"];
                 $distance = $_POST["distance"];
-                echo "<br>Current time:<br>";
+               
                 
                 include "getData.php";
                 $data = GetDataUser($name);
                 $bestTime = GetBestTime($data, $distance);
                 echo "best time on ".$distance. "m is ".$bestTime. " <br>"; 
+                $currTime = GetCurrentTime();
+                echo "<br>Current time:<br>";
+                $currTime = number_format($currTime,2);
+                echo $currTime;
                 
             }
             

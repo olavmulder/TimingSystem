@@ -35,7 +35,7 @@ function GetDataUser($name){
     return $data;
 }
 function GetBestTime($data, $distance){
-    $best = 0.0;
+    $best = NULL;
     for($i=0;$i< sizeof($data);$i =$i+1){
         if(strcmp($distance,$data[$i]['distance'])==0){
             if(floatval($data[$i]['time']) < $best || $best == 0.0){  
@@ -44,8 +44,16 @@ function GetBestTime($data, $distance){
             
         }
     }
-    return $best;
+    if($best == NULL){
+        return "not set";
+    }else{
+        return $best;
+    }
 }
+function GetCurrentTime(){
+    $res = exec("sudo /bin/bash /home/timing/website/addUser.sh {$name}");
+}
+
 ?>
 
 
