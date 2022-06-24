@@ -50,11 +50,21 @@ void Socket::SendEthernet(unsigned char data){
 }
 void Socket::ReadEthernet(){
     valread = 0;
-    while(valread < 1)valread = read(new_socket, buffer, BUFFER_SIZE);
-    std::string str = buffer;
-    long int time = atoi(str.c_str());
-    printf("Time %ld\n", time);
-    t->SetTime(time);
+    bool go;
+    while(go){
+        read(new_socket, buffer, BUFFER_SIZE);
+        printf("buffer %s\n", buffer);
+        if(strcmp(buffer, "f")==0){
+            read(new_socket, buffer, BUFFER_SIZE);
+            std::string str = buffer;
+            long int time = atoi(str.c_str());
+            printf("buffer time %ld\n", time);
+            t->SetTime(time);
+            go = false;
+        }
+    }
+    
+    
 }
 
 /*void Socket::DummyBuffer(){

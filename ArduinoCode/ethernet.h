@@ -37,9 +37,7 @@ class ETH{
     void ReceiveData(){
       char c = '0';
       while(c != '1'){ 
-        c = client.read();
-        Serial.println("received, but not 1");
-        Serial.println(c);      
+        c = client.read();      
       }
       Serial.println("received!");
       t->StartTime();

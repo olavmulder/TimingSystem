@@ -35,14 +35,17 @@ void loop(){
   eth.ReceiveData();
   //delay(7000);//7 sec;
   /*WAIT until cross*/
-  while(digitalRead(pinInput) != 1)continue;
+  while(digitalRead(pinInput) == 0)continue;
+  
   unsigned long time = eth.GetTime();
   Serial.print("time: ");
   Serial.println(time);
   char buf[15];
   String strTime = String(time);
   strTime.toCharArray(buf, 15);
+  eth.SendData("f");
   eth.SendData(buf);
+  
   
  
   
