@@ -14,7 +14,7 @@ class ETH{
     EthernetClient client;
     Timer *t;
     int port = 8080;
-    
+    char startCode = 48;
   public:
     ETH(Timer *tim){
       t = tim;
@@ -35,15 +35,28 @@ class ETH{
 
     }
     void ReceiveData(){
-      char c = '0';
-      while(c != '1'){ 
-        c = client.read();      
+      char c = 0;
+      while(c != startCode){ 
+        c = client.read();  
+        //Serial.println(c);    
       }
-      Serial.println("received!");
       t->StartTime();
+      Serial.println("received");
+      
     }
+    
     void SendData(char *buf){
-      client.write(buf);
+      client.write(buf, strlen(buf));
+
+      Serial.print("data to send: ");
+      for(int i=0;i<strlen(buf);i++){
+        Serial.print(buf[i]);
+      }
+       Serial.println();
+    }
+    /*time functions*/
+    inline void StopTime(){
+      t->StopTime();
     }
     inline unsigned long GetTime(){
       return t->GetTime();

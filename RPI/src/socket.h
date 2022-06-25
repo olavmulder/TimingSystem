@@ -9,18 +9,23 @@
 #include "timing.h"
 #define BUFFER_SIZE 15
 
+
+
+
 class Socket{
     private:
         
         ssize_t valread;
         int server_fd, new_socket;
-        char buffer[BUFFER_SIZE];
-       
+        char timeBuffer[BUFFER_SIZE];
+        char codeBuffer[2];
+        char finishCode;
        
         Timing *t;
     public:
         Socket(Timing *time){
             t = time;
+            finishCode = 49;/*'1'*/
         }
         ~Socket(){
             close(new_socket);
@@ -29,7 +34,7 @@ class Socket{
         }
         bool CreateSocket(uint16_t port);
         void ReadEthernet();
-        void SendEthernet(unsigned char data);
+        void SendEthernet(char* data);
 
         //void DummyBuffer();
 

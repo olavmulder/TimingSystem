@@ -11,26 +11,42 @@
 * 4. Place time data in currentTime file in /bin folder
 */
 unsigned char InputLazerGPIO = 12;
+unsigned char OutputLed = 16;
+char* startCode;
+char str = 48;/*0*/
+
+
 int main(){
-    printf("start\n");
-    SetupGPIO(InputLazerGPIO);
     Timing t;
     Socket s(&t);
+    SetupGPIO(InputLazerGPIO, OutputLed);
     s.CreateSocket(8080);
+    
+    SetGPIO(OutputLed);
+    while(GetInputStart(InputLazerGPIO)== 1);//lazer is not sending beam in input
+    while(GetInputStart(InputLazerGPIO) == 0){
+        SetGPIO(OutputLed);
+        sleep(1);
+        ClearGPIO(OutputLed);
+        sleep(1);
+        SetGPIO(OutputLed);
+        sleep(1);
+        if(GetInputStart(InputLazerGPIO) == 0){
+            break;
+        }
 
-    unsigned char startCode = 1;
-    while(1){
-        while(GetInputStart(InputLazerGPIO)== 0)continue;
-        
-        //printf("GO!");
-        s.SendEthernet(startCode);
-        s.ReadEthernet();
-
-        while(GetInputStart(InputLazerGPIO) == 1)continue;
-        
     }
     
     
+    
+    startCode = &str;
+
+    while(1){
+        while(!GetInputStart(InputLazerGPIO))continue;
+        s.SendEthernet(startCode);
+        s.ReadEthernet();
+    }
     return 0;
     
 }
+

@@ -1,7 +1,7 @@
 #include "gpio.h"
 
 
-void SetupGPIO(unsigned char gpioNumber){
+void SetupGPIO(unsigned char gpioPinLazerInput, unsigned char gpioPinLed){
     if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
       printf("can't open /dev/mem \n");
       exit(-1);
@@ -20,9 +20,21 @@ void SetupGPIO(unsigned char gpioNumber){
       exit(-1);
     }
     gpio = (volatile unsigned *)gpio_map;
-    INP_GPIO(gpioNumber);
-}
+    GPIO_CLR = 1 << gpioPinLazerInput;
+    INP_GPIO(gpioPinLazerInput);
 
+    INP_GPIO(gpioPinLed);
+    OUT_GPIO(gpioPinLed);
+    GPIO_CLR = 1 << gpioPinLed;
+
+
+}
+void SetGPIO(unsigned char pin){
+  GPIO_SET = 1 << pin;
+}
+void ClearGPIO(unsigned char pin){
+  GPIO_CLR = 1 << pin;
+}
 bool GetInputStart(unsigned char gpioNumber){
     return bool(GET_GPIO(gpioNumber));
 }

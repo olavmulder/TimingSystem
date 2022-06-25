@@ -9,9 +9,12 @@ class Timer{
     inline void StartTime(){
       start = millis();
     }
+    inline void StopTime(){
+      stop = millis();
+    }
     inline unsigned long GetTime(){
      
-      return millis()-start;
+      return stop-start;
     }
 
 

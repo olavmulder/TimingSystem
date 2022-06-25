@@ -8,13 +8,14 @@ void Timing::WriteTimeToFile(){
     char buf[6];
     sprintf(buf, "%.2f", time);
     file << buf;
-    //printf("writed\n");
+    printf("writed\n");
 }
 void Timing::SetTime(long int t){
     time = 0;
-    double seconds = t/1000;
-    double mil = t%1000;
-    time = seconds+(mil/1000);
-    //printf("time: %.2f", time);
+    printf("t = %ld\n", t);
+    int sec = t/1000;
+    int ms = t%1000;
+    time = sec+(ms*0.001);
+    printf("time: %.2f", time);
     WriteTimeToFile();
 }
