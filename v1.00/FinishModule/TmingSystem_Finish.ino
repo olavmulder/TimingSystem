@@ -1,5 +1,8 @@
-//server finish module
+/*
+server & finish module
 
+
+*/
 #include "ServerFinish.h"
 #include "users.h"
 #include "html.h"
@@ -14,7 +17,7 @@ void setup(){
   
     Serial.begin(9600);
     Serial.println();
-    WiFi.config(ipFinish, NULL, NULL, NULL, NULL);
+    WiFi.config(ipFinish, IPAddress(192,168,4,1), IPAddress(255,255,255,0));
     WiFi.softAP(ssid, password);
     
     Serial.print("AP IP address: ");
@@ -26,20 +29,45 @@ void setup(){
     pinMode(pinLazerCheck, OUTPUT);
     digitalWrite(pinLazerCheck,1);
 
-    server.on("/time", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send_P(200, "text/plain", ReadTime().c_str());
+    //home page
+    HtmlCombineHeader();
+    //char *htmlPage = NULL;
+    /*htmlPage = (char*)malloc(strlen(htmlHeader)+strlen(htmlFooter)+1);
+    strcat(htmlPage, htmlHeader);
+    strcat(htmlPage, htmlFooter);*/
+    server.on("/", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader);
+      a += String("<h1>Timing System </h1><br><p>made by Olav</p>");
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
     });
+    //time page
+    server.on("/time", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader + ReadTime());
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
+    });
+    //start page (only for start module)
     server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send_P(200, "text/plain", Start().c_str());
     });
-
-    server.on("/users", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send_P(200, "text/plain", u.User().c_str());
+    //user page to see all users
+    server.on("/users", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader+ u.User());
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
     });
     //input users
-    server.on("/ImportUsers", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send_P(200, "text/html", index_html);
+    char *htmlInputUser = NULL;
+    htmlInputUser = (char*)malloc(strlen(htmlInputName)+1);
+    strcat(htmlInputUser, htmlInputName);
+    server.on("/ImportUsers", HTTP_GET, [&htmlInputUser, &htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader);
+      a += String(htmlInputUser);
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
     });
+    //process ImportUsers
     server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
       String inputMessage;
       String inputParam;
