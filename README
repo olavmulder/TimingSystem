@@ -5,9 +5,6 @@ Finish is implemeted with no input from lazer
 
 #TODO next version(s)
 1. Save data to sd card
-3. Functionality to add users  in website
-4. Link time to users
-
-5. Save data to sd card
-6. On boot -> get data from sd-card and show on website
+2. Save data to sd card
+3. On boot -> get data from sd-card and show on website
 
