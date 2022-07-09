@@ -17,19 +17,21 @@ const char* password = "123456789";
 IPAddress ipFinish = {192,168,4,1};
  
 
-
+String GetStatus(){
+  return t.GetRunning() ? "true" : "false";
+}
 String Start(){
   t.Start();
   t.SetRunning(true);
-  Serial.println("started from webserver");
   return String("started!!");
 }
-String ReadTime(){
+String ReadTime(Users* userClass){
   while(t.GetRunning() )continue;
   t.GetTime();
-  String ret = "previous times: ";
-  ret = PrintList(ret);
-  ret = String(t.TimeString() + "\n\n" + ret);
+  String ret = "<u><b>previous times:</b></u> <br>";
+  ret = PrintList(userClass, ret);
+  ret = String(userClass->GetUserNameById(userClass->GetCurUserID()) + ": " + \
+                t.TimeString() + "<br>" + ret);
   return ret;
 }
 

@@ -1,9 +1,9 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
-
+#include "users.h"
 struct Node {
   float time;
-  unsigned int id;
+  unsigned int id;//runed by it
   struct Node *next;
 };
 struct Node *head;
@@ -20,11 +20,9 @@ struct Node* MakeList(float t, unsigned int i){
  
 }
 
-struct Node* AddItem(struct Node *l, float t, unsigned int i){
- Serial.println("addItem");
+struct Node* AddItem(struct Node *l, float t, unsigned int i){;
  Node* dum;
  dum = (struct Node*)malloc(sizeof(struct Node));
- Serial.println("malloc dum");
  l->next = dum;
  dum->next = NULL;
  dum->time = t;
@@ -35,21 +33,14 @@ struct Node* AddItem(struct Node *l, float t, unsigned int i){
 int GetLastId(Node* l){
   return l->id;
 }
-String PrintList(String s){
-  Serial.println("PrintList");
+String PrintList(Users *userClass, String s){
   struct Node *n;
   n = (struct Node*)malloc(sizeof(struct Node));
   n = head;
-  Serial.println("list::");
   while(n != NULL){
-    s = String(s + String(n->id) + ": " + String(n->time,3) + "\n");
-    Serial.println("String V");
-    Serial.print(n->id);
-    Serial.print(" ");
-    Serial.println(n->time);
+    s = String(s + String(userClass->GetUserNameById(n->id)) + ": " + String(n->time,3) + "<br>");
     n = n->next;
   }
-  Serial.println("end print list");
   return s;
 }
 #endif

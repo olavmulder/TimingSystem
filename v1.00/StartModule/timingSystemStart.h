@@ -12,6 +12,7 @@ const char* ssid = "ESP8266-AP";
 const char* password = "123456789";
 const char* serverNameStart = "http://192.168.4.1/start";
 const char* serverNameTime = "http://192.168.4.1/time";
+const char* serverNameStatus = "http://192.168.4.1/status";
 bool sendSignal;
 
 
@@ -43,13 +44,25 @@ String httpGETRequest(const char* serverName) {
    }else {
       Serial.println("WiFi Disconnected");
    }
-   
 }
-
+bool GetStartStatus(){
+  //get running status, if true, there is started but not finished
+  // if false, there is finsihsed = ready to start again.
+  String ret = httpGETRequest(serverNameStatus);
+  if(strcmp(ret.c_str(), "false") == 0){
+    Serial.println("false");
+    return true;
+  }else if(strcmp(ret.c_str(), "true") == 0){
+    Serial.println("true");
+    return false;
+  }
+  Serial.println("nothing");
+  return true;  
+}
 void SendStartSignal(){
     String ret = httpGETRequest(serverNameStart);
-    Serial.print("ret: ");
-    Serial.println(ret);
+    //Serial.print("ret: ");
+    //Serial.println(ret);
 }
 
 void InitLazerInput(unsigned char ledPin, unsigned char inputPin ){

@@ -9,8 +9,7 @@ TODO:
   Add Function to start from signal(sound etc.) instead of led indicator
 
 */
-unsigned long prevTime;
-const unsigned long interval = 1000;
+
 
 const byte startSignalData = 49; // == "1"
 IPAddress ipFinish = {192,168,4,1};
@@ -34,11 +33,11 @@ void setup() {
   WiFi.begin(ssid,password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    //Serial.print(".");
   }
   /*someting with leds...*/
-  Serial.println("");
-  Serial.println("Connected to WiFi");
+  //Serial.println("");
+  //Serial.println("Connected to WiFi");
   Serial.println(WiFi.localIP());
   
 
@@ -49,16 +48,13 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(lazerInputPin), ISR, RISING);
 }
 void loop() {
-  unsigned long curTime = millis();
-  
-  if( (curTime - prevTime) >= interval) {
-    if(sendSignal){
-      SendStartSignal();
-      Serial.println("isr: SendStartSignal");
-      sendSignal = false;
-      prevTime = millis();
-    }
+  //while(!GetStartStatus())continue;//wait till finished;
+  if(sendSignal){//finished wait till started
+    SendStartSignal();
+    //Serial.println("isr: SendStartSignal");
+    sendSignal = false;
   }
+
 }
 
 

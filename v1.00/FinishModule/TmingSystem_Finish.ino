@@ -4,15 +4,16 @@ server & finish module
 
 */
 #include "ServerFinish.h"
-#include "users.h"
 #include "html.h"
 Users u;
 unsigned int amountRecords = 0;
 unsigned int prevAmountRecords;
+unsigned long prevMillis = 0, curMillis, interval = 1000;
 struct Node *list;
 struct UserList *userList;
 
 const char* PARAM_INPUT_1 = "name";
+const char* PARAM_INPUT_2 = "selectUser";
 void setup(){
   
     Serial.begin(9600);
@@ -24,7 +25,7 @@ void setup(){
     Serial.println(WiFi.softAPIP());
 
 
-    userList = u.MakeList(NULL);
+    userList = u.MakeList(String("default"));
     unsigned char pinLazerCheck = 0;
     pinMode(pinLazerCheck, OUTPUT);
     digitalWrite(pinLazerCheck,1);
@@ -43,13 +44,31 @@ void setup(){
     });
     //time page
     server.on("/time", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
-      String a = String(htmlHeader + ReadTime());
+      String a = String(htmlHeader);
+      String selectOptions;
+      /*get all users*/
+      UserList *l = u.GetHead();
+
+      while(l != NULL){
+        selectOptions += String("<option value=\""+ String(l->id) +"\">" + l->name +"</option>" );
+        l = l->next;        
+      }
+      a += "Selected user is: ";
+      a += u.GetUserNameById(u.GetCurUserID()) + "<br>";
+      a += htmlUserSelectForm;
+      a += selectOptions;
+      a += htmlUserSelectForm2;      
+      a += ReadTime(&u);
       a += String(htmlFooter);
+      /*dropdown menu with all the users*/
       request->send_P(200, "text/html", a.c_str());
     });
     //start page (only for start module)
     server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send_P(200, "text/plain", Start().c_str());
+    });
+    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", GetStatus().c_str());
     });
     //user page to see all users
     server.on("/users", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
@@ -57,13 +76,22 @@ void setup(){
       a += String(htmlFooter);
       request->send_P(200, "text/html", a.c_str());
     });
+    //set curUser from input from /time page
+    server.on("/selectUser", HTTP_GET, [](AsyncWebServerRequest *request){
+      String inputMessage;
+      String inputParam;
+      // GET  value on <ESP_IP>/selectUser?selectUser=<inputMessage>
+      if (request->hasParam(PARAM_INPUT_2)) {
+        inputMessage = request->getParam(PARAM_INPUT_2)->value();
+        int b = inputMessage.toInt();
+        u.SetCurUserID(b);
+      }
+      request->send_P(200, "text/html", htmlGoback);           
+    });
     //input users
-    char *htmlInputUser = NULL;
-    htmlInputUser = (char*)malloc(strlen(htmlInputName)+1);
-    strcat(htmlInputUser, htmlInputName);
-    server.on("/ImportUsers", HTTP_GET, [&htmlInputUser, &htmlHeader](AsyncWebServerRequest *request){
+    server.on("/ImportUsers", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader);
-      a += String(htmlInputUser);
+      a += String(htmlInputName);
       a += String(htmlFooter);
       request->send_P(200, "text/html", a.c_str());
     });
@@ -75,11 +103,10 @@ void setup(){
       if (request->hasParam(PARAM_INPUT_1)) {
         inputMessage = request->getParam(PARAM_INPUT_1)->value();
         inputParam = PARAM_INPUT_1;
-        userList = u.AddItem(userList, (char*)inputMessage.c_str());
+        userList = u.AddItem(userList, inputMessage);
       }
-      request->send(200, "text/html", "HTTP GET request sent to your ESP on input field (" 
-                                     + inputParam + ") with value: " + inputMessage +
-                                     "<br><a href=\"/time\">Return to Home Page</a>");
+      request->send(200, "text/html", "User with name " + inputMessage +
+                                     " is added. <br><a href=\"/\">Return to Home Page</a>");
     });
     server.begin();
 
@@ -96,20 +123,24 @@ void setup(){
 }
 
 ICACHE_RAM_ATTR void ISR(){
-  
-  if(t.GetRunning() == true){
-    t.Stop();
-    t.SetRunning(false);
-    Serial.println("isr: StopSignal");
-    amountRecords ++;
+  curMillis = millis(); 
+  if(curMillis - prevMillis >= interval){
+    if(t.GetRunning() == true){
+      t.Stop();
+      t.SetRunning(false);
+      Serial.println("isr: StopSignal");
+      amountRecords ++;
+      prevMillis = millis();
+    }
   }
   
 }
 
 
 void loop(){
+    
     while(prevAmountRecords == amountRecords)delay(1);
-    list = AddItem(list,t.TimeString().toFloat(),amountRecords);
+    list = AddItem(list,t.TimeString().toFloat(),u.GetCurUserID());
     prevAmountRecords = amountRecords;
   }
   //SaveTimes();
