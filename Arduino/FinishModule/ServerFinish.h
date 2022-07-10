@@ -17,9 +17,6 @@ const char* password = "123456789";
 IPAddress ipFinish = {192,168,4,1};
  
 
-String GetStatus(){
-  return t.GetRunning() ? "true" : "false";
-}
 String Start(){
   t.Start();
   t.SetRunning(true);
@@ -38,9 +35,9 @@ String ReadTime(Users* userClass){
 
 void InitLazerInput(unsigned char ledPin, unsigned char inputPin ){
   while(digitalRead(inputPin) == 1){
-    delay(1000);
+    delay(500);
     digitalWrite(ledPin, 1);
-    delay(1000);
+    delay(500);
     digitalWrite(ledPin, 0);
     if(digitalRead(inputPin) == 0){
       delay(3000);

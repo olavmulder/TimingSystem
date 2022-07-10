@@ -5,6 +5,8 @@ server & finish module
 */
 #include "ServerFinish.h"
 #include "html.h"
+
+#define PIN_FINISH 5
 Users u;
 unsigned int amountRecords = 0;
 unsigned int prevAmountRecords;
@@ -18,24 +20,19 @@ void setup(){
   
     Serial.begin(9600);
     Serial.println();
+    pinMode(PIN_FINISH, OUTPUT);
     WiFi.config(ipFinish, IPAddress(192,168,4,1), IPAddress(255,255,255,0));
     WiFi.softAP(ssid, password);
     
-    Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());
+    /*Serial.print("AP IP address: ");
+    Serial.println(WiFi.softAPIP());*/
+    
 
 
     userList = u.MakeList(String("default"));
-    unsigned char pinLazerCheck = 0;
-    pinMode(pinLazerCheck, OUTPUT);
-    digitalWrite(pinLazerCheck,1);
-
+    
     //home page
     HtmlCombineHeader();
-    //char *htmlPage = NULL;
-    /*htmlPage = (char*)malloc(strlen(htmlHeader)+strlen(htmlFooter)+1);
-    strcat(htmlPage, htmlHeader);
-    strcat(htmlPage, htmlFooter);*/
     server.on("/", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader);
       a += String("<h1>Timing System </h1><br><p>made by Olav</p>");
@@ -46,7 +43,7 @@ void setup(){
     server.on("/time", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader);
       String selectOptions;
-      /*get all users*/
+      /*get all users and place in option form*/
       UserList *l = u.GetHead();
 
       while(l != NULL){
@@ -67,9 +64,8 @@ void setup(){
     server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send_P(200, "text/plain", Start().c_str());
     });
-    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send_P(200, "text/plain", GetStatus().c_str());
-    });
+    //unused right now -- remove -- ??
+   
     //user page to see all users
     server.on("/users", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader+ u.User());
@@ -111,12 +107,14 @@ void setup(){
     server.begin();
 
   //lazer input init
+  pinMode(0, OUTPUT);
+  digitalWrite(0,1);
   unsigned char lazerInputPin = 4;
   pinMode(lazerInputPin, INPUT);
-  InitLazerInput(pinLazerCheck, lazerInputPin);
+  InitLazerInput(0, lazerInputPin);
   attachInterrupt(digitalPinToInterrupt(lazerInputPin), ISR, RISING);
 
-  /**/
+  /*make a new list for timing*/
   list = MakeList(t.TimeString().toFloat(), amountRecords);
   prevAmountRecords = amountRecords;
 
@@ -125,10 +123,13 @@ void setup(){
 ICACHE_RAM_ATTR void ISR(){
   curMillis = millis(); 
   if(curMillis - prevMillis >= interval){
+    //if not started dont finish
     if(t.GetRunning() == true){
       t.Stop();
       t.SetRunning(false);
+      digitalWrite(PIN_FINISH, 1);
       Serial.println("isr: StopSignal");
+
       amountRecords ++;
       prevMillis = millis();
     }
@@ -139,8 +140,14 @@ ICACHE_RAM_ATTR void ISR(){
 
 void loop(){
     
-    while(prevAmountRecords == amountRecords)delay(1);
+  if(prevAmountRecords != amountRecords){
     list = AddItem(list,t.TimeString().toFloat(),u.GetCurUserID());
     prevAmountRecords = amountRecords;
   }
+  //one sec after finish go off
+  if(millis() - prevMillis >= interval && /*digitalRead(PIN_FINSH) == 1*/t.GetRunning() == false){
+    digitalWrite(PIN_FINISH, 0);
+  }
+  delay(1);
+}
   //SaveTimes();
