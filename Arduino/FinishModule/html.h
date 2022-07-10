@@ -55,6 +55,7 @@ const char htmlNavBar[] = R"rawliteral(
       <li><a href="/time">Time</a></li>
       <li><a href="/users">Users</a></li>
       <li><a href="/ImportUsers">Import users</a></li>
+      <li><a href="/sdCard">Data functionalities</a></li>
     </ul>
   )rawliteral";
 String htmlHeader;

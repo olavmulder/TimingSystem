@@ -1,18 +1,37 @@
-#ifndef TIMING
-#define TIMING
+#ifndef TIMING_H
+#define TIMING_H
+#include "Users.h"
 
+struct TimeList {
+      float time;
+      unsigned int id;
+      struct TimeList *next;
+    };
 
-class Timing{
+class TIMING{
   private: 
     unsigned long time;
     unsigned long startTime;
     String timeString;
     bool running;
+    
+    USERS *u;
+    
   public:
-    inline void Start(){
+    
+
+    TIMING(USERS* us);
+    struct TimeList *head;
+
+    struct TimeList* MakeList(float t, unsigned int i);
+    struct TimeList* AddItem(struct TimeList* l, float t, unsigned int i);
+    int GetLastId(struct TimeList* l);
+    String PrintTimeList(String s, bool html);
+
+    inline void StartTime(){
       startTime = millis();
     }
-    inline void Stop(){
+    inline void StopTime(){
       time = millis()-startTime;
     }
     inline unsigned long GetTime(){

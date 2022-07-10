@@ -1,5 +1,10 @@
-#include "users.h"
-String Users::GetUserNameById(unsigned int id){
+#include "Users.h"
+
+USERS::USERS(){
+  curUser = 0;
+  userIDCounter = 0;
+}
+String USERS::GetUserNameById(unsigned int id){
   struct UserList *dum = headUserList;
   while(dum->id != id){
     dum = dum->next;
@@ -7,23 +12,23 @@ String Users::GetUserNameById(unsigned int id){
   return dum->name;
 }
 
-String Users::User(){
+String USERS::User(){
   String s = "All the users:<br>";
   return PrintUserList(s);
 }
-void Users::SetCurUserID(unsigned int id){
+void USERS::SetCurUserID(unsigned int id){
   curUser = id;
 }
-unsigned int Users::GetCurUserID(){
+unsigned int USERS::GetCurUserID(){
   return curUser;
 }
 //linked list imp
 
     //linked list
-struct UserList* Users::GetHead(){
+struct UserList* USERS::GetHead(){
   return headUserList;
 }
-struct UserList* Users::MakeList(String n){
+struct UserList* USERS::MakeList(String n){
   struct UserList *l;
   l = (struct UserList*)malloc(sizeof(struct UserList));
   headUserList = (struct UserList*)malloc(sizeof(struct UserList));
@@ -34,7 +39,7 @@ struct UserList* Users::MakeList(String n){
   headUserList = l;
   return l;
 }
-struct UserList* Users::AddItem(struct UserList *l,  String n){
+struct UserList* USERS::AddItem(struct UserList *l,  String n){
   struct UserList* dum;
   dum = (struct UserList*)malloc(sizeof(struct UserList));
   l->next = dum;
@@ -46,7 +51,7 @@ struct UserList* Users::AddItem(struct UserList *l,  String n){
 
 }
 
-String Users::PrintUserList(String s){
+String USERS::PrintUserList(String s){
   struct UserList *n;
   n = (struct UserList*)malloc(sizeof(struct UserList));
   n = headUserList;

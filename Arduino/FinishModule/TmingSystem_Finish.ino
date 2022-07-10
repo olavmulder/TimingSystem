@@ -1,33 +1,37 @@
 /*
 server & finish module
-
-
 */
 #include "ServerFinish.h"
 #include "html.h"
+#include "SD_Reader.h"
 
+//defines
 #define PIN_FINISH 5
-Users u;
+#define SD_CS_PIN 16
+//classes;
+USERS u;
+TIMING t(&u);
+ServerFinish sf(&t);
+SD_READER sdReader(SD_CS_PIN,&t);
+//variables
 unsigned int amountRecords = 0;
 unsigned int prevAmountRecords;
 unsigned long prevMillis = 0, curMillis, interval = 1000;
-struct Node *list;
-struct UserList *userList;
-
 const char* PARAM_INPUT_1 = "name";
 const char* PARAM_INPUT_2 = "selectUser";
+AsyncWebServer server(SERVER_PORT);
+//lists
+struct TimeList *timeList;
+struct UserList *userList;
+//functions
+void InitLazerInput(unsigned char ledPin, unsigned char inputPin );
+
+//start
 void setup(){
   
     Serial.begin(9600);
     Serial.println();
     pinMode(PIN_FINISH, OUTPUT);
-    WiFi.config(ipFinish, IPAddress(192,168,4,1), IPAddress(255,255,255,0));
-    WiFi.softAP(ssid, password);
-    
-    /*Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());*/
-    
-
 
     userList = u.MakeList(String("default"));
     
@@ -55,17 +59,16 @@ void setup(){
       a += htmlUserSelectForm;
       a += selectOptions;
       a += htmlUserSelectForm2;      
-      a += ReadTime(&u);
+      a += sf.ReadTime(&u);
       a += String(htmlFooter);
       /*dropdown menu with all the users*/
       request->send_P(200, "text/html", a.c_str());
     });
     //start page (only for start module)
     server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send_P(200, "text/plain", Start().c_str());
+      request->send_P(200, "text/plain", sf.Start().c_str());
     });
-    //unused right now -- remove -- ??
-   
+      
     //user page to see all users
     server.on("/users", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader+ u.User());
@@ -88,6 +91,30 @@ void setup(){
     server.on("/ImportUsers", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
       String a = String(htmlHeader);
       a += String(htmlInputName);
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
+    });
+    //save time to sd card
+    server.on("/sdCard", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader);
+      a += String(sdReader.WriteTimeToFile(timeList, userList));
+      a += String("<br><a href=\"/time\">Go back to Time</a>");
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
+    });
+    /*TODO save times*/
+    server.on("/saveTime", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader);
+      a += String(sdReader.WriteTimeToFile(timeList, userList));
+      a += String("<br><a href=\"/time\">Go back to Time</a>");
+      a += String(htmlFooter);
+      request->send_P(200, "text/html", a.c_str());
+    });
+    /*TODO!! restore times*/
+    server.on("/restoreTime", HTTP_GET, [&htmlHeader](AsyncWebServerRequest *request){
+      String a = String(htmlHeader);
+      a += String("Restore times from SD card");
+      a += String("")
       a += String(htmlFooter);
       request->send_P(200, "text/html", a.c_str());
     });
@@ -115,7 +142,8 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(lazerInputPin), ISR, RISING);
 
   /*make a new list for timing*/
-  list = MakeList(t.TimeString().toFloat(), amountRecords);
+  float timeDum = t.TimeString().toFloat();
+  timeList = t.MakeList(timeDum, amountRecords);
   prevAmountRecords = amountRecords;
 
 }
@@ -125,10 +153,10 @@ ICACHE_RAM_ATTR void ISR(){
   if(curMillis - prevMillis >= interval){
     //if not started dont finish
     if(t.GetRunning() == true){
-      t.Stop();
+      t.StopTime();
       t.SetRunning(false);
       digitalWrite(PIN_FINISH, 1);
-      Serial.println("isr: StopSignal");
+      //Serial.println("isr: StopSignal");
 
       amountRecords ++;
       prevMillis = millis();
@@ -141,7 +169,7 @@ ICACHE_RAM_ATTR void ISR(){
 void loop(){
     
   if(prevAmountRecords != amountRecords){
-    list = AddItem(list,t.TimeString().toFloat(),u.GetCurUserID());
+    timeList = t.AddItem(timeList,t.TimeString().toFloat(),u.GetCurUserID());
     prevAmountRecords = amountRecords;
   }
   //one sec after finish go off
@@ -150,4 +178,24 @@ void loop(){
   }
   delay(1);
 }
-  //SaveTimes();
+void InitLazerInput(unsigned char ledPin, unsigned char inputPin ){
+  while(digitalRead(inputPin) == 1){
+    delay(500);
+    digitalWrite(ledPin, 1);
+    delay(500);
+    digitalWrite(ledPin, 0);
+    if(digitalRead(inputPin) == 0){
+      delay(3000);
+      for(unsigned char i = 0;i < 5;i++){
+        digitalWrite(ledPin, 1);
+        delay(100);
+        digitalWrite(ledPin, 0);
+        delay(100);
+      }
+      if(digitalRead(inputPin) == 0){
+        return;
+      }
+    }
+  }
+  digitalWrite(ledPin,0);
+}
